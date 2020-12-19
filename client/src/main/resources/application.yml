@@ -1,0 +1,33 @@
+server:
+  port: 8080
+spring:
+  application:
+    name: shanhaihen-client
+config:
+  service:
+    version: 1.0.0
+dubbo:
+  application:
+    name: shanhaihen-dubbo-client
+  scan:
+    base-packages: com.shanhaihen.client
+  protocol:
+    id: dubbo
+    name: dubbo
+    port: -1
+    status: server
+    threads: 500
+  registry:
+    id: zookeeper
+    address: zookeeper://192.168.120.129:2181
+  metadata-report:
+    id: zookeeper-meta
+    address: zookeeper://192.168.120.129:2181
+  consumer:
+    check: false
+    timeout: 30000
+    threads: 500
+  provider:
+    timeout: 30000
+    threads: 500
+
