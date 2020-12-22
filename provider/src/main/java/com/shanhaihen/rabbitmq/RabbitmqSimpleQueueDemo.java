@@ -11,7 +11,7 @@ public class RabbitmqSimpleQueueDemo {
     public static void main(String[] args) throws IOException, TimeoutException {
         //创建链接mq的工厂
         ConnectionFactory connectionFactory = new ConnectionFactory();
-        connectionFactory.setHost("192.168.120.129");
+        connectionFactory.setHost("rabbitmq.shanhaihen.com");
         connectionFactory.setPort(5672);
         connectionFactory.setVirtualHost("/ems");
         connectionFactory.setUsername("ems");
