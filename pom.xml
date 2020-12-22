@@ -29,6 +29,7 @@
         <spring.version>2.4.0</spring.version>
         <dubbo-spring-boot-starter.version>2.7.3</dubbo-spring-boot-starter.version>
         <curator-recipes.version>2.13.0</curator-recipes.version>
+        <amqp-client.version>5.7.2</amqp-client.version>
     </properties>
 
     <dependencyManagement>
@@ -59,6 +60,11 @@
                 <artifactId>spring-boot-starter-test</artifactId>
                 <scope>test</scope>
                 <version>${spring.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.rabbitmq</groupId>
+                <artifactId>amqp-client</artifactId>
+                <version>${amqp-client.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.curator</groupId>
