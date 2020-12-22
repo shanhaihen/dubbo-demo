@@ -5,6 +5,9 @@ import com.rabbitmq.client.*;
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
+/**
+ * 简单队列
+ */
 public class RabbitmqSimpleQueueDemo {
     public static void main(String[] args) throws IOException, TimeoutException, InterruptedException {
         //创建链接mq的工厂
