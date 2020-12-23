@@ -10,7 +10,7 @@ import java.util.concurrent.TimeoutException;
 /**
  * 工作队列
  */
-public class RabbitmqWorkQueueDemo {
+public class WorkQueueProvider {
     public static void main(String[] args) throws IOException, TimeoutException {
         //创建链接mq的工厂
         ConnectionFactory connectionFactory = new ConnectionFactory();

@@ -9,10 +9,11 @@ import java.util.concurrent.TimeoutException;
 
 /**
  * 工作队列
- * 解决丢失问题 ，不自动确认，每次只消费一条消息
- * 如果存在未确认的数据，会等消费者下线后，重新分配对应的消费者
+ * 默认 消费者会平均分配，循环，
+ * 一次性把数据全部给消费者，自动确认成功，消费者如果报错数据就有可能丢失
+ * 会堆积消息
  */
-public class RabbitmqWorkQueueDemo1 {
+public class WorkQueueConsume {
     public static void main(String[] args) throws IOException, TimeoutException {
 
         ExecutorService executorService = Executors.newFixedThreadPool(2);
@@ -55,12 +56,6 @@ public class RabbitmqWorkQueueDemo1 {
         Connection connection = connectionFactory.newConnection();
         //创建通道
         Channel channel = connection.createChannel();
-
-        /**
-         * 每次只消费一条消息
-         */
-        channel.basicQos(1);
-
         /**
          * 通道绑定对应的消息队列
          * 参数1： 队列名称，会自动创建
@@ -71,14 +66,13 @@ public class RabbitmqWorkQueueDemo1 {
          */
         channel.queueDeclare("workQueue", false, false, false, null);
 
-
         /**
          * 消费消息
          * 参数1：消费哪个队列的消息
          * 参数2： 开启消息的自动确认机制
          * 参数2：消费消息时的回调接口
          */
-        channel.basicConsume("workQueue", false, new DefaultConsumer(channel) {
+        channel.basicConsume("workQueue", true, new DefaultConsumer(channel) {
             /**
              * 处理消息回调
              * @param consumerTag 标签
@@ -91,12 +85,6 @@ public class RabbitmqWorkQueueDemo1 {
             public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
                 //如果通道关闭的话，则这个回调可能没有调用到，所以不建议关闭通道
                 System.out.println(name + "================>body：" + new String(body));
-                /**
-                 * 参数1： 确认的是队列种哪个具体的消息
-                 * 参数2： 是否开启多个消息同时确认
-                 */
-                if (name.equals("body1"))
-                    channel.basicAck(envelope.getDeliveryTag(), false);
             }
         });
     }
