@@ -1,4 +1,4 @@
-package com.shanhaihen.rabbitmq;
+package rabbitmq;
 
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
@@ -11,7 +11,7 @@ import java.util.concurrent.TimeoutException;
  * 路由模式
  * 不支持通配符
  */
-public class TopicProvider {
+public class DirectProvider {
 
     public static void main(String[] args) throws IOException, TimeoutException {
         //创建链接mq的工厂
@@ -30,14 +30,13 @@ public class TopicProvider {
          * 参数1：表示交换机的名称
          * 参数2：交换机类型 direct 路由模式
          */
-        channel.exchangeDeclare("logs_topic", "topic");
+        channel.exchangeDeclare("logs_direct", "direct");
         //发送消息
-        String routingkey = "user.save";
-        channel.basicPublish("logs_topic", "user", null, ("这个是topic模型发布的基于route key【user】发送的消息").getBytes());
+        String routingkey = "info";
+        channel.basicPublish("logs_direct",routingkey,null,("这个是direct模型发布的基于route key:"+routingkey+":发送的消息").getBytes());
 
-        channel.basicPublish("logs_topic", routingkey, null, ("这个是topic模型发布的基于route key【" + routingkey + "】发送的消息").getBytes());
+        channel.basicPublish("logs_direct","error",null,("这个是direct模型发布的基于route key:"+routingkey+":发送的消息").getBytes());
 
-        channel.basicPublish("logs_topic", "user.error.findAll", null, ("这个是topic模型发布的基于route key 【user.error.findAll】 发送的消息").getBytes());
 
 
         channel.close();

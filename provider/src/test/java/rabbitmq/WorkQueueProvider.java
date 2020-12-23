@@ -1,4 +1,4 @@
-package com.shanhaihen.rabbitmq;
+package rabbitmq;
 
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
@@ -8,9 +8,9 @@ import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
 /**
- * 简单队列
+ * 工作队列
  */
-public class SimpleQueueProvider {
+public class WorkQueueProvider {
     public static void main(String[] args) throws IOException, TimeoutException {
         //创建链接mq的工厂
         ConnectionFactory connectionFactory = new ConnectionFactory();
@@ -30,7 +30,7 @@ public class SimpleQueueProvider {
          * 参数4： 是否在消费完成后自动删除队列 true：自动删除 false:不自动删除
          * 参数5：附加参数
          */
-        channel.queueDeclare("hello", false, false, false, null);
+        channel.queueDeclare("workQueue", false, false, false, null);
 
         //发布消息
         /**
@@ -40,7 +40,9 @@ public class SimpleQueueProvider {
          * 参数3： 传递消息额外设置
          * 参数4: 具体的消息内容
          */
-        channel.basicPublish("", "hello", null, "hello rebbitmq".getBytes());
+        for (int i=0;i<10;i++) {
+            channel.basicPublish("", "workQueue", null, (i+"：===hello rebbitmq").getBytes());
+        }
 
         channel.close();
         connection.close();

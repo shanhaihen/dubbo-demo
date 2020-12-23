@@ -1,4 +1,4 @@
-package com.shanhaihen.rabbitmq;
+package rabbitmq;
 
 import com.rabbitmq.client.*;
 
@@ -6,19 +6,30 @@ import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeoutException;
-
 /**
  * 路由模式
  * 不支持通配符
  */
-public class TopicConsume {
+public class DirectConsume {
     public static void main(String[] args) {
         ExecutorService executorService = Executors.newFixedThreadPool(3);
         executorService.execute(new Runnable() {
             @Override
             public void run() {
                 try {
-                    createFanoutConsume();
+                    createFanoutConsume("error");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (TimeoutException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        executorService.execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    createFanoutConsume("info");
                 } catch (IOException e) {
                     e.printStackTrace();
                 } catch (TimeoutException e) {
@@ -30,7 +41,7 @@ public class TopicConsume {
 
     }
 
-    private static void createFanoutConsume() throws IOException, TimeoutException {
+    private static void createFanoutConsume(String routingkey) throws IOException, TimeoutException {
         //创建链接mq的工厂
         ConnectionFactory connectionFactory = new ConnectionFactory();
         connectionFactory.setHost("rabbitmq.shanhaihen.com");
@@ -45,7 +56,7 @@ public class TopicConsume {
         /**
          * 通道绑定交换机
          */
-        channel.exchangeDeclare("logs_topic", "topic");
+        channel.exchangeDeclare("logs_direct", "direct");
         /**
          * 創建临时队列
          */
@@ -53,12 +64,9 @@ public class TopicConsume {
 
         /**
          * 绑定交换机和队列
-         * 动态通配符的方式
-         * *代表一个单词
-         * #代表多个
+         * 支持绑定多个
          */
-//        channel.queueBind(queueName, "logs_topic", "user.*");
-        channel.queueBind(queueName, "logs_topic", "user.#");
+        channel.queueBind(queueName, "logs_direct", routingkey);
 
 
         /**
@@ -79,7 +87,7 @@ public class TopicConsume {
             @Override
             public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
                 //如果通道关闭的话，则这个回调可能没有调用到，所以不建议关闭通道
-                System.out.println("topicConsume================>body：" + new String(body));
+                System.out.println(routingkey + ":FanoutConsume================>body：" + new String(body));
             }
         });
         //

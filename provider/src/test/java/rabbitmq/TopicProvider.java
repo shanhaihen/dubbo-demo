@@ -1,4 +1,4 @@
-package com.shanhaihen.rabbitmq;
+package rabbitmq;
 
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
@@ -8,9 +8,11 @@ import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
 /**
- * 广播模式 提供者
+ * 路由模式
+ * 不支持通配符
  */
-public class FanoutProvider {
+public class TopicProvider {
+
     public static void main(String[] args) throws IOException, TimeoutException {
         //创建链接mq的工厂
         ConnectionFactory connectionFactory = new ConnectionFactory();
@@ -26,22 +28,17 @@ public class FanoutProvider {
         /**
          * 将通道声明为指定的交换机
          * 参数1：表示交换机的名称
-         * 参数2：交换机类型 fanout 广播类型
+         * 参数2：交换机类型 direct 路由模式
          */
-        channel.exchangeDeclare("logs","fanout");
+        channel.exchangeDeclare("logs_topic", "topic");
+        //发送消息
+        String routingkey = "user.save";
+        channel.basicPublish("logs_topic", "user", null, ("这个是topic模型发布的基于route key【user】发送的消息").getBytes());
 
+        channel.basicPublish("logs_topic", routingkey, null, ("这个是topic模型发布的基于route key【" + routingkey + "】发送的消息").getBytes());
 
-        //发布消息
-        /**
-         * 简单队列 没有交换机
-         * 参数1 交换机
-         * 参数2：队列名称 对于广播来说此参数没有意义
-         * 参数3： 传递消息额外设置
-         * 参数4: 具体的消息内容
-         */
-        for (int i=0;i<10;i++) {
-            channel.basicPublish("logs", "", null, (i+"：fanout type message").getBytes());
-        }
+        channel.basicPublish("logs_topic", "user.error.findAll", null, ("这个是topic模型发布的基于route key 【user.error.findAll】 发送的消息").getBytes());
+
 
         channel.close();
         connection.close();
